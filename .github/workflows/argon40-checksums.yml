@@ -1,4 +1,4 @@
-name: Update checksums
+name: SHA-256 checksums auto-generation (broken)
 
 on:
   workflow_dispatch:
