@@ -1,5 +1,7 @@
 # Work-in-Progress RHEL-based Argon ONE scripts
 
+[![SHA-256 checksums generation](https://github.com/ManuHry/Argon40-argon1-RHEL/actions/workflows/argon40-checksums-regenerate.yml/badge.svg?branch=RHEL-compat)](https://github.com/ManuHry/Argon40-argon1-RHEL/actions/workflows/argon40-checksums-regenerate.yml)
+
 ## Reference
 
 Source code is based on [okunze/Argon40-ArgonOne-Script](https://github.com/okunze/Argon40-ArgonOne-Script/) for simplicity. Quality and reliability seems enough.
