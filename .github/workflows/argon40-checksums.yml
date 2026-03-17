@@ -1,0 +1,45 @@
+name: Update checksums
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ RHEL-compat ]
+    paths:
+      - 'source/**'
+
+jobs:
+  checksums:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
+      - name: Detect changed files
+        id: changed
+        run: |
+          git diff --name-only HEAD^ HEAD \
+            | grep '^source/' \
+            | grep -v '\-custom\.' \
+            | grep -v '\.sha256$' \
+            > changed_files.txt || true
+
+      - name: Generate checksums
+        run: |
+          while read file; do
+            if [ -f "$file" ]; then
+              sha256sum "$file" | awk '{print $1}' > "$file.sha256"
+            fi
+          done < changed_files.txt
+
+      - name: Commit checksum updates
+        run: |
+          if [ -s changed_files.txt ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            find source -type f -name "*.sha256" | xargs git add
+            git commit -m "Update checksums"
+            git push
+          fi

@@ -1,0 +1,30 @@
+name: Regenerate all checksums
+
+on:
+  workflow_dispatch:
+    branches: [ RHEL-compat ]
+
+jobs:
+  checksums:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v6
+
+      - name: Generate checksums
+        run: |
+          find source -type f \
+            ! -name "*-custom.*" \
+            ! -name "*.sha256" \
+            | while read file; do
+                sha256sum "$file" | awk '{print $1}' > "$file.sha256"
+              done
+
+      - name: Commit checksum updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          find source -type f -name "*.sha256" | xargs git add
+          git commit -m "Regenerate all checksums"
+          git push
