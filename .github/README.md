@@ -1,13 +1,13 @@
 # Work-in-Progress RHEL-based Argon ONE scripts
 
-[![SHA-256 checksums generation](https://github.com/ManuHry/Argon40-argon1-RHEL/actions/workflows/argon40-checksums-regenerate.yml/badge.svg?branch=RHEL-compat)](https://github.com/ManuHry/Argon40-argon1-RHEL/actions/workflows/argon40-checksums-regenerate.yml)
-
 ## Reference
 
 Source code is based on [okunze/Argon40-ArgonOne-Script](https://github.com/okunze/Argon40-ArgonOne-Script/) for simplicity. Quality and reliability seems enough.
 
 > [!TIP]
 > Using corresponding \*.\***.sha256** files you can compare checksums with original files... or even generate checksums manually!
+> 
+> [![SHA-256 checksums generation](https://github.com/ManuHry/Argon40-argon1-RHEL/actions/workflows/argon40-checksums-regenerate.yml/badge.svg?branch=RHEL-compat)](https://github.com/ManuHry/Argon40-argon1-RHEL/actions/workflows/argon40-checksums-regenerate.yml)
 
 > [!NOTE]
 > Argon ONE V5 and Argon ONE UP scripts added upstream at 03/17/2026, check **.csv* file on this repo root for more information.
