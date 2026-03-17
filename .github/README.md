@@ -73,8 +73,8 @@ Icons | Meaning
 👽 | no OS support for this RPi rev.
 ⏲ | waiting for code readyness
 
-RPi rev. | Argon ONE rev. | Specificity |  OS version | Status | Comment
-:------: | :------------: | :---------: |  :--------: | :----: | :-----:
+RPi rev. | Ar1 rev. | Specificity |  OS version | Status | Comment
+:------: | :------: | :---------: |  :--------: | :----: | :-----:
 CM5 | UP | *👻 none* | Fedora 42+ | 👽
 CM5 | UP | *👻 none* | AlmaLinux 8+ | 💤 | needs argononeup.sh modification
 CM5 | UP | *👻 none* | Rocky Linux 8+ | 💤 | needs argononeup.sh modification
@@ -91,9 +91,9 @@ CM5 | UP | *👻 none* | Rocky Linux 8+ | 💤 | needs argononeup.sh modificatio
 🐌 3 | *legacy* | *👻 none* | AlmaLinux 8+ | ❓
 🐌 3 | *legacy* | *👻 none* | Rocky Linux 10+ | 👽
 🐌 3 | *legacy* | *👻 none* | Rocky Linux 8-9 | ❓
-Zero 2 W | *👻 none* | 🔬 distro PoC | Fedora 42+ | 🚧 | argononed.service starts... 🤔
-Zero 2 W | *👻 none* | 🔬 distro PoC | AlmaLinux 8+ | 🚧 | argononed.service starts... 🤔
-Zero 2 W | *👻 none* | 🔬 distro PoC | Rocky Linux 8+ | 🚧 | argononed.service starts... 🤔
+Zero 2W | *👻 none* | 🔬 distro PoC | Fedora 42+ | 🚧 | argononed.service starts... 🤔
+Zero 2W | *👻 none* | 🔬 distro PoC | AlmaLinux 8+ | 🚧 | argononed.service starts... 🤔
+Zero 2W | *👻 none* | 🔬 distro PoC | Rocky Linux 8+ | 🚧 | argononed.service starts... 🤔
 <!--
 🌠 5 | V5 | M.2 NVMe PCIe | Fedora 42+ | 👽
 🌠 5 | V5 | M.2 NVMe PCIe | AlmaLinux 8+ | 💤
