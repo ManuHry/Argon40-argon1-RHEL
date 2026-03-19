@@ -853,6 +853,16 @@ then
 		# EEPROM Config Script
 		sudo $eepromconfigscript
 	fi
+elif [ "$CHECKPLATFORMID" = "almalinux" ]
+then
+	if [ -f "$eepromrpiscript" ]
+	then
+		echo "Checking EEPROM ..."
+		sudo dnf update -y
+		sudo rpi-eeprom-update
+		# EEPROM Config Script
+		sudo $eepromconfigscript
+	fi
 else
 	echo "WARNING: EEPROM not updated.  Please run this under Raspberry Pi OS"
 fi
