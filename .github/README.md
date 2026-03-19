@@ -42,9 +42,9 @@ Implemented modifications:
 - [x] add RHEL detection and use dnf (perhaps yum for legacy compatibility? *quite odd...*)
 - [x] append already existing packages detection *(for example wget and python3 can be missing on minimal setups)*
 - [x] rectify Argon Forty download server references to already existing var
+- [x] add AlmaLinux rpi-eeprom-update procedure
 
 Waiting merge:
-- [ ] add AlmaLinux rpi-eeprom-update procedure
 - [ ] prepare downloaded files for RHEL compatibility?
 - [ ] prepare wget detection for upcoming RHEL 11+ (wget2!)
 - [ ] probably more...
