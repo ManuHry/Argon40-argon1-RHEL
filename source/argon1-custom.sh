@@ -853,12 +853,14 @@ then
 		# EEPROM Config Script
 		sudo $eepromconfigscript
 	fi
-elif [ "$CHECKPLATFORMID" = "almalinux" ]
+elif [ "$CHECKPLATFORMID" = "almalinux" ] # custom: add EEPROM update also for AlmaLinux
 then
 	if [ -f "$eepromrpiscript" ]
 	then
+		echo "WARNING: EEPROM update is recent on AlmaLinux, consider to run this under Raspberry Pi OS"
 		echo "Checking EEPROM ..."
-		sudo dnf update -y
+		sudo dnf update -y # custom: keep same steps as for Raspberry Pi OS
+		sudo dnf install -y rpi-eeprom # custom: package is optionnal on RPi images, requires manual installation
 		sudo rpi-eeprom-update
 		# EEPROM Config Script
 		sudo $eepromconfigscript
