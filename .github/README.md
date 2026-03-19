@@ -94,6 +94,12 @@ CM5 | UP | *👻 none* | Rocky Linux 8+ | 💤 | needs argononeup.sh modificatio
 Zero 2W | *👻 none* | 🔬 distro PoC | Fedora 42+ | 🚧 | argononed.service starts... 🤔
 Zero 2W | *👻 none* | 🔬 distro PoC | AlmaLinux 8+ | 🚧 | argononed.service starts... 🤔
 Zero 2W | *👻 none* | 🔬 distro PoC | Rocky Linux 8+ | 🚧 | argononed.service starts... 🤔
+
+> [!NOTE]
+> About distro Proof-of-Concept, tests were done in two steps:
+> 1. using a virtual machine that boots from a Linux image with as few packages as possible
+> 2. emulating a Raspberry Pi 3B on QEMU: check [ManuHry/qemu-rpi](https://github.com/ManuHry/qemu-rpi/) to learn more
+
 <!--
 🌠 5 | V5 | M.2 NVMe PCIe | Fedora 42+ | 👽
 🌠 5 | V5 | M.2 NVMe PCIe | AlmaLinux 8+ | 💤
