@@ -22,7 +22,7 @@ Main goal is to adapt existing [Argon Forty](https://argon40.com/blogs/argon-res
 ## How to use (at your own risks!)
 
 > [!WARNING]
-> Dependencies are still downloaded from Argon Forty server. If you want to avoid any conflict, host files locally and adapt ARGONDOWNLOADSERVER var.
+> Dependencies are still downloaded from Argon Forty server. If you want to avoid any conflict, host files locally and adapt `ARGONDOWNLOADSERVER` var.
 
 Simply use the good old dirty command from Argon Forty (change path as your needs):
 ```Shell
@@ -39,14 +39,14 @@ curl -k https://PATH_OF_HOSTED_FILES/tools/setntpserver-custom.sh | bash
 Implemented modifications:
 - [x] migrate from Google time servers to [pool.ntp.org](https://www.ntppool.org/)
 - [x] add SHA256 checksums of original files to allow comparison with Argon Forty servers
-- [x] add RHEL detection and use dnf (perhaps yum for legacy compatibility? *quite odd...*)
-- [x] append already existing packages detection *(for example wget and python3 can be missing on minimal setups)*
+- [x] add RHEL detection and use `dnf` (perhaps yum for legacy compatibility? *quite odd...*)
+- [x] append already existing packages detection *(for example `wget` and `python3` can be missing on minimal setups)*
 - [x] rectify Argon Forty download server references to already existing var
-- [x] add AlmaLinux rpi-eeprom-update procedure
+- [x] add AlmaLinux `rpi-eeprom-update` procedure
 
 Waiting merge:
 - [ ] prepare downloaded files for RHEL compatibility?
-- [ ] prepare wget detection for upcoming RHEL 11+ (wget2!)
+- [ ] prepare `wget` detection for upcoming RHEL 11+ (`wget2`!)
 - [ ] probably more...
 
 ## Tests and reported compatibility matrix
@@ -57,9 +57,9 @@ Waiting merge:
 > [!IMPORTANT]
 > Some tests are needed... please report if following works for you:
 > - installation script does not return any error
-> - argononed.service starts without warnings
+> - **argononed.service** starts without warnings
 > - you can change behaviours with argonone-config
-> - fans turns ou/off and adapt speed to temperatures
+> - fans turns on/off and adapt speed to temperatures
 > - shutdown button works as expected (test short press, double tap and long press >3s!)
 > - anything useful
 
