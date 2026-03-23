@@ -44,6 +44,8 @@ Implemented modifications:
 - [x] rectify Argon Forty download server references to already existing var
 - [x] add AlmaLinux `rpi-eeprom-update` procedure
 - [x] adapt i2c detection and activation commands from [RPi-Distro/raspi-config](https://github.com/RPi-Distro/raspi-config/)
+  - use `/etc/modules-load.d/i2c-dev.conf` instead of Debian-based path `/etc/modules`
+  - use dtparam command of [dtmerge from raspberrypi/utils](https://github.com/raspberrypi/utils) only on AlmaLinux
 
 Waiting merge:
 - [ ] prepare downloaded files for RHEL compatibility?
