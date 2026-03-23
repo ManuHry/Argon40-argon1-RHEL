@@ -316,7 +316,10 @@ then
 			sudo raspi-config nonint do_serial 2
 		fi
 	fi
-	elif [ "$CHECKPLATFORM" = "Red Hat" ] # custom: force i2c & serial activation with raspi-config portage from Argon Forty
+elif [ "$CHECKPLATFORM" = "Red Hat" ] # custom: force i2c & serial activation with raspi-config portage from Argon Forty
+then
+	# custom: need to import do_i2c & get_i2c from raspi-config
+	if [ ! "$CHECKDEVICE" = "fanhat" ] # custom: serial activation
 	then
 		if [ $(get_serial_hw) -eq 1 ]; then
 			do_serial_hw 0
