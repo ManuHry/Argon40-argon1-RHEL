@@ -157,7 +157,11 @@ do_i2c_rhel() {
   if ! grep -q "^i2c[-_]dev" $I2CMODULE; then
     printf "i2c-dev\n" | sudo tee -a "$I2CMODULE" > /dev/null
   fi
-  sudo dtparam i2c_arm=$SETTING
+  if grep -q 'ID="almalinux"' /etc/os-release; then
+    sudo dtparam i2c_arm=$SETTING
+  else
+    echo "WARNING: I2C cannot be added dynamically from Device Tree.  Please reboot to apply"
+  fi
   modprobe i2c-dev
 }
 
@@ -357,8 +361,7 @@ then
 	fi
 elif [ "$CHECKPLATFORM" = "Red Hat" ] # custom: force i2c & serial activation with raspi-config portage from Argon Forty
 then
-	# custom: need to import do_i2c & get_i2c from raspi-config
-	if [ ! "$CHECKDEVICE" = "fanhat" ] # custom: serial activation
+	if [ ! "$CHECKDEVICE" = "fanhat" ]
 	then
 		if [ $(get_i2c) -eq 1 ]; then
 			do_i2c_rhel 0
