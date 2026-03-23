@@ -316,6 +316,12 @@ then
 			sudo raspi-config nonint do_serial 2
 		fi
 	fi
+	elif [ "$CHECKPLATFORM" = "Red Hat" ] # custom: force i2c & serial activation with raspi-config portage from Argon Forty
+	then
+		if [ $(get_serial_hw) -eq 1 ]; then
+			do_serial_hw 0
+		fi
+	fi
 fi
 
 if [ "$CHECKDEVICE" = "oneoled" ]
