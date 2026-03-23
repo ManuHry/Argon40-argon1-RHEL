@@ -43,6 +43,7 @@ Implemented modifications:
 - [x] append already existing packages detection *(for example `wget` and `python3` can be missing on minimal setups)*
 - [x] rectify Argon Forty download server references to already existing var
 - [x] add AlmaLinux `rpi-eeprom-update` procedure
+- [x] adapt i2c detection and activation commands from [RPi-Distro/raspi-config](https://github.com/RPi-Distro/raspi-config/)
 
 Waiting merge:
 - [ ] prepare downloaded files for RHEL compatibility?
@@ -57,9 +58,9 @@ Waiting merge:
 > [!IMPORTANT]
 > Some tests are needed... please report if following works for you:
 > - installation script does not return any error
-> - **argononed.service** starts without warnings
+> - **argononed.service** starts without warnings, specifically *`python3[*]: Unable to detect i2c`*
 > - you can change behaviours with argonone-config
-> - fans turns on/off and adapt speed to temperatures
+> - fans turns on/off and adapts speed to temperatures
 > - shutdown button works as expected (test short press, double tap and long press >3s!)
 > - anything useful
 
