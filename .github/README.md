@@ -42,7 +42,7 @@ Implemented modifications:
 - [x] add RHEL detection and use `dnf` (perhaps yum for legacy compatibility? *quite odd...*)
 - [x] append already existing packages detection *(for example `wget` and `python3` can be missing on minimal setups)*
 - [x] rectify Argon Forty download server references to already existing var
-- [x] add AlmaLinux `rpi-eeprom-update` procedure
+- [x] add AlmaLinux `rpi-eeprom-update` procedure (from [AlmaLinux rpi-eeprom package](https://git.almalinux.org/rpms/rpi-eeprom/src/branch/a9/SPECS/rpi-eeprom.spec))
 - [x] adapt i2c detection and activation commands from [RPi-Distro/raspi-config](https://github.com/RPi-Distro/raspi-config/)
   - use `/etc/modules-load.d/i2c-dev.conf` instead of Debian-based path `/etc/modules`
   - use dtparam command of [dtmerge from raspberrypi/utils](https://github.com/raspberrypi/utils) only on AlmaLinux
