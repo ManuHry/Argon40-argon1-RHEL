@@ -122,6 +122,45 @@ do_serial_hw() {
   fi
 }
 
+# custom: add get_i2c and do_i2c (adapted) based on raspi-config
+
+BLACKLIST=/etc/modprobe.d/raspi-blacklist.conf
+I2CMODULE=/etc/modules-load.d/i2c-dev.conf
+
+get_i2c() {
+  if grep -q -E "^(device_tree_param|dtparam)=([^,]*,)*i2c(_arm)?(=(on|true|yes|1))?(,.*)?$" $CONFIG; then
+    echo 0
+  else
+    echo 1
+  fi
+}
+
+do_i2c_rhel() {
+  RET=$1
+  if [ $RET -eq 0 ]; then
+    SETTING=on
+  elif [ $RET -eq 1 ]; then
+    SETTING=off
+  else
+    return $RET
+  fi
+
+  set_config_var dtparam=i2c_arm $SETTING $CONFIG &&
+  if ! [ -e $BLACKLIST ]; then
+    sudo touch $BLACKLIST
+  fi
+  sudo sed $BLACKLIST -i -e "s/^\(blacklist[[:space:]]*i2c[-_]bcm2708\)/#\1/"
+  if ! [ -e $I2CMODULE ]; then
+    sudo touch $I2CMODULE
+  fi 
+  sudo sed $I2CMODULE -i -e "s/^#[[:space:]]*\(i2c[-_]dev\)/\1/"
+  if ! grep -q "^i2c[-_]dev" $I2CMODULE; then
+    printf "i2c-dev\n" | sudo tee -a "$I2CMODULE" > /dev/null
+  fi
+  sudo dtparam i2c_arm=$SETTING
+  modprobe i2c-dev
+}
+
 # End code lifted from raspi-config
 ##########
 
@@ -321,6 +360,9 @@ then
 	# custom: need to import do_i2c & get_i2c from raspi-config
 	if [ ! "$CHECKDEVICE" = "fanhat" ] # custom: serial activation
 	then
+		if [ $(get_i2c) -eq 1 ]; then
+			do_i2c_rhel 0
+		fi
 		if [ $(get_serial_hw) -eq 1 ]; then
 			do_serial_hw 0
 		fi
