@@ -186,15 +186,7 @@ set_maxusbcurrent() {
 argon_check_pkg() {
 	if [ "$CHECKPLATFORM" = "Red Hat" ] # custom: add RHEL package detection
 	then
-		if [ "$1" = "wget" ] # custom: Fedora 42+ has wget2!
-		then
-			if [ "$CHECKPLATFORMID" = "fedora" ]
-			then
-				rpm -q wget2 &>/dev/null && echo "OK" || echo "NG"
-			else
-				rpm -q wget &>/dev/null && echo "OK" || echo "NG"
-			fi
-		elif [ "$1" != "python3" ] # custom: package name in RHEL is python3*, just ignore it
+		if [ "$1" != "python3" ] # custom: package name in RHEL is python3*, just ignore it
 		then
 			rpm -q "$1" &>/dev/null && echo "OK" || echo "NG"
 		fi
@@ -275,11 +267,15 @@ fi
 
 smbuspkg="python3-smbus" # custom: default Debian package
 oledpkg="python3-luma.oled" # custom: default Debian package
+wgetpkg="wget" # custom: original Wget1 on older distro
 if [ "$CHECKPLATFORM" = "Red Hat" ] # custom: adapt two precedent packages for RHEL
 then
 	smbuspkg="python3-i2c-tools" # custom: python3-smbus package is different for RHEL
 	oledpkg="" # custom: currently no equivalent found for RHEL... would need an install via Python pip
-	if [ "$CHECKPLATFORMVERSION" = "8" ] # custom: reuse already existing var to detect RHEL 8 as it needs an additionnal step
+	if [ "$CHECKPLATFORMID" = "fedora" ] || [ $(($CHECKPLATFORMVERSION)) -ge 11 ]
+	then
+	    wgetpkg="wget2" # custom: Wget2 is the successor of Wget1 and default since Fedora 40 (probably RHEL 11+ also?)
+	elif [ "$CHECKPLATFORMVERSION" = "8" ] # custom: reuse already existing var to detect RHEL 8 as it needs an additionnal step
 	then
 		sudo dnf install -y epel-release # custom: for python3-libgpiod on RHEL 8 only
 		if [ "$CHECKPLATFORMID" = "almalinux" ]
