@@ -46,10 +46,10 @@ Implemented modifications:
 - [x] adapt i2c detection and activation commands from [RPi-Distro/raspi-config](https://github.com/RPi-Distro/raspi-config/)
   - use `/etc/modules-load.d/i2c-dev.conf` instead of Debian-based path `/etc/modules`
   - use dtparam command of [dtmerge from raspberrypi/utils](https://github.com/raspberrypi/utils) only on AlmaLinux
+- [x] prepare `wget` detection for upcoming RHEL 11+ with [Wget2](https://gitlab.com/gnuwget/wget2/)! note: [Fedora 40+ already migrated package](https://fedoraproject.org/wiki/Changes/Wget2asWget/)
 
-Waiting merge:
+Remaining tasks:
 - [ ] prepare downloaded files for RHEL compatibility?
-- [ ] prepare `wget` detection for upcoming RHEL 11+ (`wget2`!)
 - [ ] probably more...
 
 ## Tests and reported compatibility matrix
