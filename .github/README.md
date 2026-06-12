@@ -101,7 +101,7 @@ Zero 2W | *👻 none* | 🔬 distro PoC | Rocky Linux 8+ | 🚧 | argononed.serv
 > [!NOTE]
 > About distro Proof-of-Concept, tests were done in two steps:
 > 1. using a virtual machine that boots from a Linux image with as few packages as possible
-> 2. emulating a Raspberry Pi 3B on QEMU: check [ManuHry/qemu-rpi](https://github.com/ManuHry/qemu-rpi/) to learn more
+> 2. emulating a Raspberry Pi 3B on QEMU: check [blu3b3rry-sh/qemu-rpi](https://github.com/blu3b3rry-sh/qemu-rpi/) to learn more
 
 <!--
 🌠 5 | V5 | M.2 NVMe PCIe | Fedora 42+ | 👽
