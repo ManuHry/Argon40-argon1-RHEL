@@ -69,14 +69,59 @@ else
 fi
 CONFIG=/boot${FIRMWARE}/config.txt
 
-set_config_var() {
-    if ! grep -q -E "$1=$2" $3 ; then
-      echo "$1=$2" | sudo tee -a $3 > /dev/null
-    fi
-}
-
 # End code lifted from raspi-config
 ##########
+
+
+set_config_var() {
+	# Own version that writes to [all] section
+	TARGET="$1=$2"
+
+	# Ensure [all] section exists
+	if ! grep -q "^\[all\]" "$3"; then
+		echo "[all]" | sudo tee -a "$3" > /dev/null
+	fi
+
+	# Extract the [all] section
+	ALL_SECTION=$(awk '
+		/^\[all\]/ {in_all=1; next}
+		/^\[/ && !/^\[all\]/ {in_all=0}
+		in_all {print}
+	' "$3")
+
+	echo "$ALL_SECTION" | grep -q "^$TARGET$"
+	EXISTS=$?
+
+	if [ $EXISTS -ne 0 ]
+	then
+		TMPCONFIG="/dev/shm/tmpconfig.txt"
+
+		# Append inside [all] section
+		sudo awk -v target="$TARGET" '
+			/^\[all\]/ {
+				print
+				in_all=1
+				next
+			}
+			/^\[/ && in_all==1 {
+				# We are leaving [all] section → append before next section
+				print target
+				in_all=0
+			}
+			{print}
+			END {
+				# If file ended while still in [all], append at end
+				if (in_all==1) {
+					print target
+				}
+			}
+		' "$3" > "$TMPCONFIG"
+
+		sudo tee "$3" < "$TMPCONFIG" > /dev/null
+		sudo rm "$TMPCONFIG"
+	fi
+}
+
 
 # Reuse set_config_var
 set_nvme_default() {
