@@ -72,11 +72,6 @@ else
 fi
 CONFIG=/boot${FIRMWARE}/config.txt
 
-set_config_var() {
-    if ! grep -q -E "$1=$2" $3 ; then
-      echo "$1=$2" | sudo tee -a $3 > /dev/null
-    fi
-}
 
 is_pifive() {
   grep -q "^Revision\s*:\s*[ 123][0-9a-fA-F][0-9a-fA-F]4[0-9a-fA-F][0-9a-fA-F][0-9a-fA-F]$" /proc/cpuinfo
@@ -124,6 +119,56 @@ do_serial_hw() {
 
 # End code lifted from raspi-config
 ##########
+
+set_config_var() {
+	# Own version that writes to [all] section
+	TARGET="$1=$2"
+
+	# Ensure [all] section exists
+	if ! grep -q "^\[all\]" "$3"; then
+		echo "[all]" | sudo tee -a "$3" > /dev/null
+	fi
+
+	# Extract the [all] section
+	ALL_SECTION=$(awk '
+		/^\[all\]/ {in_all=1; next}
+		/^\[/ && !/^\[all\]/ {in_all=0}
+		in_all {print}
+	' "$3")
+
+	echo "$ALL_SECTION" | grep -q "^$TARGET$"
+	EXISTS=$?
+
+	if [ $EXISTS -ne 0 ]
+	then
+		TMPCONFIG="/dev/shm/tmpconfig.txt"
+
+		# Append inside [all] section
+		sudo awk -v target="$TARGET" '
+			/^\[all\]/ {
+				print
+				in_all=1
+				next
+			}
+			/^\[/ && in_all==1 {
+				# We are leaving [all] section → append before next section
+				print target
+				in_all=0
+			}
+			{print}
+			END {
+				# If file ended while still in [all], append at end
+				if (in_all==1) {
+					print target
+				}
+			}
+		' "$3" > "$TMPCONFIG"
+
+		sudo tee "$3" < "$TMPCONFIG" > /dev/null
+		sudo rm "$TMPCONFIG"
+	fi
+}
+
 
 # Reuse is_pifive, set_config_var
 set_nvme_default() {
@@ -271,7 +316,7 @@ then
 	cat $CONFIG | grep -v 'dtoverlay=dwc2' > $TMPCONFIGFILE
 	chmod 755 $TMPCONFIGFILE
 	sudo cp $TMPCONFIGFILE $CONFIG
-	set_config_var dtoverlay=dwc2,dr_mode host $CONFIG
+	set_config_var dtoverlay dwc2,dr_mode=host $CONFIG
 	rm $TMPCONFIGFILE
 fi
 

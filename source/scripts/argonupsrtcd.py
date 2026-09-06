@@ -26,6 +26,7 @@ UPS_LOGFILE="/dev/shm/upslog.txt"
 UPS_CMDFILE="/dev/shm/upscmd.txt"
 
 RTC_CONFIGFILE = "/etc/argonupsrtc.conf"
+BATTERY_CONFIGFILE = "/etc/argonupsbattery.conf"
 
 
 #############
@@ -130,11 +131,11 @@ def ups_sendcmd(cmdstr):
 
 	return outobj
 
-def ups_loadlogdata():
+def ups_loadlogdata(fname = UPS_LOGFILE):
 	# status, version, time, schedule
 	outobj = {}
 	try:
-		fp = open(UPS_LOGFILE, "r")
+		fp = open(fname, "r")
 		logdata = fp.read()
 		alllines = logdata.split("\n")
 		ctr = 0
@@ -151,6 +152,28 @@ def ups_loadlogdata():
 
 	return outobj
 
+def ups_checkbatterydata(forcereset = False):
+	sendcmdid = -1
+	if forcereset == True:
+		sendcmdid = 9
+	else:
+		batterdataobj = ups_loadlogdata(BATTERY_CONFIGFILE)
+		try:
+			curtime = datetime.datetime.now()
+			lastreset = datetime.datetime.strptime(batterdataobj["lastreset"], "%a %b %d %H:%M:%S %Y")
+
+			# Compare difference
+			if curtime - lastreset > datetime.timedelta(days=30):
+				sendcmdid = 9
+		except:
+			# File not exists or entry not exists for reset
+			sendcmdid = 9
+
+	if sendcmdid == 9:
+		with open(BATTERY_CONFIGFILE, "w") as txt_file:
+			txt_file.write("lastreset: "+time.asctime(time.localtime(time.time()))+"\n")
+	return sendcmdid
+
 def ups_check(readq):
 	CMDSTARTBYTE=0xfe
 	CMDCONTROLBYTECOUNT=3
@@ -160,11 +183,13 @@ def ups_check(readq):
 
 	lastcmdtime=""
 	loopCtr = CHECKSTATUSLOOPFREQ
-	sendcmdid = -1
 
 	ups_debuglog("serial", "Starting "+UPS_SERIALPORT)
 
 	updatedesktopicon("Argon UPS", "Argon UPS", "/etc/argon/ups/loading_0.png")
+
+	sendcmdid = ups_checkbatterydata()
+	cmddatastr = ""
 
 	while True: # Outer loop to reconnect to device
 
@@ -448,7 +473,7 @@ def updatedesktopicon(icontitle, statusstr, tmpiconfile):
 			#ups_debuglog("desktop-update-text", statusstr)
 			#ups_debuglog("desktop-update-icon", tmpiconfile)
 			with open(curfolder+"/Desktop/argonone-ups.desktop", "w") as txt_file:
-				txt_file.write("[Desktop Entry]\nName="+icontitle+"\nComment="+statusstr+"\nIcon="+tmpiconfile+"\nExec=lxterminal --working-directory="+curfolder+"/ -t \"Argon UPS\" -e \"/etc/argon/argonone-upsconfig.sh argonupsrtc\"\nType=Application\nEncoding=UTF-8\nTerminal=false\nCategories=None;\n")
+				txt_file.write("[Desktop Entry]\nName="+icontitle+"\nComment="+statusstr+"\nIcon="+tmpiconfile+"\nExec=lxterminal --working-directory="+curfolder+"/ -t \"Argon UPS\" -e \"/etc/argon/argonone-upsconfig.sh\"\nType=Application\nEncoding=UTF-8\nTerminal=false\nCategories=None;\n")
 	except Exception as desktope:
 		#pass
 		try:
@@ -486,7 +511,8 @@ if len(sys.argv) > 1:
 			print(outobj["power"])
 		except:
 			print("Error retrieving battery status")
-
+	elif cmd == "BATTERYMETERRESET":
+		ups_sendcmd("9")
 	elif cmd == "GETRTCSCHEDULE":
 		tmptime = getRTCpoweronschedule()
 		if tmptime.year > 1999:

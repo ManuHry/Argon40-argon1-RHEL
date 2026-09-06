@@ -1,12 +1,62 @@
 #!/bin/bash
 
-
 if [ -e /boot/firmware/config.txt ] ; then
   FIRMWARE=/firmware
 else
   FIRMWARE=
 fi
 CONFIG=/boot${FIRMWARE}/config.txt
+
+set_config_var() {
+	# Own version that writes to [all] section
+	TARGET="$1=$2"
+
+	# Ensure [all] section exists
+	if ! grep -q "^\[all\]" "$3"; then
+		echo "[all]" | sudo tee -a "$3" > /dev/null
+	fi
+
+	# Extract the [all] section
+	ALL_SECTION=$(awk '
+		/^\[all\]/ {in_all=1; next}
+		/^\[/ && !/^\[all\]/ {in_all=0}
+		in_all {print}
+	' "$3")
+
+	echo "$ALL_SECTION" | grep -q "^$TARGET$"
+	EXISTS=$?
+
+	if [ $EXISTS -ne 0 ]
+	then
+		TMPCONFIG="/dev/shm/tmpconfig.txt"
+
+		# Append inside [all] section
+		sudo awk -v target="$TARGET" '
+			/^\[all\]/ {
+				print
+				in_all=1
+				next
+			}
+			/^\[/ && in_all==1 {
+				# We are leaving [all] section → append before next section
+				print target
+				in_all=0
+			}
+			{print}
+			END {
+				# If file ended while still in [all], append at end
+				if (in_all==1) {
+					print target
+				}
+			}
+		' "$3" > "$TMPCONFIG"
+
+		sudo tee "$3" < "$TMPCONFIG" > /dev/null
+		sudo rm "$TMPCONFIG"
+	fi
+}
+
+set_config_var dtoverlay dwc2,dr_mode=host $CONFIG
 
 CHECKGPIOMODE="libgpiod" # gpiod or rpigpio
 
@@ -56,18 +106,17 @@ daemonrtcservice=/lib/systemd/system/$rtcdaemonname.service
 rtcdaemonscript=$INSTALLATIONFOLDER/$rtcdaemonname.py
 
 
+echo "-----------------------------------"
+echo " Argon Industria UPS Configuration"
+echo "-----------------------------------"
+
 requireinstall=0
 newmode=0
 if [ ! -z "$1" ]
 then
 	requireinstall=1
-	newmode=3 # installation
-fi
-
-echo "-----------------------------------"
-echo " Argon Industria UPS Configuration"
-echo "-----------------------------------"
-if [ ! -f "$upsdaemonscript" ]
+	newmode=4 # installation
+elif [ ! -f "$upsdaemonscript" ]
 then
 	echo "Install Argon Industria UPS Tools"
 	echo -n "Press Y to continue:"
@@ -86,7 +135,7 @@ then
 	fi
 
 	requireinstall=1
-	newmode=3	# Reinstall
+	newmode=4	# Reinstall
 
 fi
 
@@ -117,12 +166,12 @@ get_number () {
 
 UPSCMDFILE="/dev/shm/upscmd.txt"
 UPSSTATUSFILE="/dev/shm/upslog.txt"
+upsconfigscript=$INSTALLATIONFOLDER/argonone-upsconfig.sh
 rtcconfigscript=$INSTALLATIONFOLDER/argonups-rtcconfig.sh
 
 
 if [ -f "$UPSSTATUSFILE" ] && [ -f "$rtcconfigscript" ]
 then
-#	cat $UPSSTATUSFILE
 	sudo $pythonbin $rtcdaemonscript GETBATTERY
 fi
 
@@ -136,35 +185,28 @@ do
 		echo "Select option:"
 		echo "  1. UPS Battery Status"
 		echo "  2. Configure RTC and/or Schedule"
-		echo "  3. Reinstall UPS Tools"
-		echo "  4. Uninstall UPS Tools"
+		echo "  3. Battery Meter Reset"
+		echo "  4. Reinstall UPS Tools"
+		echo "  5. Uninstall UPS Tools"
 		echo ""
 		echo "  0. Back"
 
-		echo -n "Enter Number (0-4):"
+		echo -n "Enter Number (0-5):"
 
 		newmode=$( get_number )
 	fi
-	if [[ $newmode -ge 0 && $newmode -le 4 ]]
+	if [[ $newmode -ge 0 && $newmode -le 5 ]]
 	then
 		if [ $newmode -eq 1 ]
 		then
 			sudo $pythonbin $rtcdaemonscript GETBATTERY
-			#if [ -f "$UPSSTATUSFILE" ]
-			#then
-			#	cat $UPSSTATUSFILE
-			#else
-			#	echo "Unable to retrieve status"
-			#fi
 		elif [ $newmode -eq 2 ]
 		then
 			$rtcconfigscript "argonupsrtc"
-			#TMPTIMESTR=`date +"%Y%d%m%H%M%S"`
-			#TMPDATASTR=`date +"%Y %m %d %H %M %S"`
-
-			#echo "$TMPTIMESTR" > $UPSCMDFILE
-			#echo "3 $TMPDATASTR" >> $UPSCMDFILE
 		elif [ $newmode -eq 3 ]
+		then
+			sudo $pythonbin $rtcdaemonscript BATTERYMETERRESET
+		elif [ $newmode -eq 4 ]
 		then
 			# Start installation
 			if [ ! -d "$INSTALLATIONFOLDER/ups" ]
@@ -217,7 +259,7 @@ do
 				echo "Name=Argon UPS" >> $shortcutfile
 				echo "Comment=Argon UPS" >> $shortcutfile
 				echo "Icon=/etc/argon/ups/loading_0.png" >> $shortcutfile
-				echo 'Exec='$terminalcmd' "Argon UPS" -e "'$rtcconfigscript' argonupsrtc"' >> $shortcutfile
+				echo 'Exec='$terminalcmd' "Argon UPS" -e "'$upsconfigscript'"' >> $shortcutfile
 				echo "Type=Application" >> $shortcutfile
 				echo "Encoding=UTF-8" >> $shortcutfile
 				echo "Terminal=false" >> $shortcutfile
@@ -289,8 +331,9 @@ do
 			then
 				# Called from setup script
 				loopflag=0
+				echo "You may need to restart for changes to take effect"
 			fi
-		elif [ $newmode -eq 4 ]
+		elif [ $newmode -eq 5 ]
 		then
 			sudo systemctl stop "$daemonname.service"
 			sudo systemctl disable "$daemonname.service"
